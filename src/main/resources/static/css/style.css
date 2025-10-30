@@ -1,0 +1,9 @@
+body { font-family: Arial, Helvetica, sans-serif; margin: 20px; }
+nav a { margin-right: 10px; }
+.container { max-width: 900px; margin-top: 10px; }
+table { width: 100%; border-collapse: collapse; }
+table, th, td { border: 1px solid #ccc; }
+th, td { padding: 8px; text-align: left; }
+.msg { padding: 8px; margin-bottom: 10px; border-radius: 4px; }
+.msg.success { background: #e6ffed; border: 1px solid #9be6a3; }
+.msg.error { background: #ffe6e6; border: 1px solid #e69b9b; }

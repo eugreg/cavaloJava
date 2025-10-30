@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Cavalos - [[${title}]]</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+<body>
+<nav>
+    <a href="/horses">Lista de Cavalos</a> |
+    <a href="/horses/new">Cadastrar Cavalo</a>
+</nav>
+<hr/>
+<div class="container">
+    <div th:if="${success}" class="msg success" th:text="${success}"></div>
+    <div th:if="${error}" class="msg error" th:text="${error}"></div>
+
+    <div th:replace="~{::content}"></div>
+</div>
+</body>
+</html>
