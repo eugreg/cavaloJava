@@ -2,33 +2,185 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Chat com Gemini</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HorseApp - Chat Inteligente</title>
+    <style>
+        /* Reset básico e Fontes */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f3f4f6; /* Cinza suave */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Container Principal (Card) */
+        .chat-card {
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 600px;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        h2 {
+            color: #1f2937;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        /* Área de Texto */
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            color: #374151;
+            resize: vertical; /* Permite redimensionar apenas altura */
+            transition: border-color 0.2s;
+            outline: none;
+            margin-bottom: 1rem;
+        }
+
+        textarea:focus {
+            border-color: #3b82f6; /* Azul foco */
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Botão */
+        button {
+            width: 100%;
+            background-color: #3b82f6;
+            color: white;
+            padding: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        button:hover {
+            background-color: #2563eb;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        /* Área de Resposta */
+        h3 {
+            margin-top: 2rem;
+            margin-bottom: 0.5rem;
+            color: #4b5563;
+            font-size: 1.1rem;
+        }
+
+        pre {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            padding: 1rem;
+            border-radius: 8px;
+            color: #374151;
+            font-family: 'Consolas', 'Monaco', monospace;
+            white-space: pre-wrap; /* Quebra de linha automática */
+            word-wrap: break-word;
+            min-height: 60px;
+            line-height: 1.5;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
 
-<h2>Chat</h2>
+<div class="chat-card">
+    <h2>🐴 Horse Assistant</h2>
 
-<textarea id="pergunta" rows="4" cols="50" placeholder="Digite sua pergunta"></textarea>
-<br><br>
-<button onclick="enviarPergunta()">Enviar</button>
+    <textarea id="pergunta" rows="4" placeholder="Pergunte algo sobre cavalos..."></textarea>
 
-<h3>Resposta:</h3>
-<pre id="resposta"></pre>
+    <button id="btnEnviar" onclick="enviarPergunta()">
+        Enviar Pergunta
+    </button>
+
+    <h3>Resposta:</h3>
+    <pre id="resposta">Aguardando pergunta...</pre>
+</div>
 
 <script>
     async function enviarPergunta() {
-        const pergunta = document.getElementById("pergunta").value;
+        const btn = document.getElementById("btnEnviar");
+        const textArea = document.getElementById("pergunta");
+        const respostaArea = document.getElementById("resposta");
+        const pergunta = textArea.value;
 
-        const response = await fetch("/horses/chat", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(pergunta)
-        });
+        if (!pergunta.trim()) {
+            alert("Por favor, digite uma pergunta.");
+            return;
+        }
 
-        const text = await response.text();
-        document.getElementById("resposta").innerText = text;
+        // Estado de Loading
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading-spinner"></span> Pensando...';
+        respostaArea.innerText = "Consultando o especialista...";
+
+        try {
+            const response = await fetch("/horses/chat", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                // Assumindo que seu backend aceita a string direta.
+                // Se der erro, troque para JSON.stringify({ prompt: pergunta })
+                body: JSON.stringify(pergunta)
+            });
+
+            if (!response.ok) {
+                throw new Error(`Erro na API: ${response.status}`);
+            }
+
+            const text = await response.text();
+            respostaArea.innerText = text;
+
+        } catch (error) {
+            console.error(error);
+            respostaArea.innerText = "Ocorreu um erro ao tentar se comunicar com o servidor.";
+        } finally {
+            // Restaura o botão
+            btn.disabled = false;
+            btn.innerText = "Enviar Pergunta";
+        }
     }
 </script>
 
